@@ -5,4 +5,4 @@
 - ASP.NET Core MVC
 - Razor
 - Bootstrap
-- .NET Core 2.1
+- .NET Core 3.1
