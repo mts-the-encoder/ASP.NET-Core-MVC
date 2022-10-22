@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using WebSales.Data;
 using WebSales.Models.Entities;
+using WebSales.Services.Exceptions;
 
 namespace WebSales.Services
 {
@@ -28,7 +31,7 @@ namespace WebSales.Services
 
         public Seller FindById(int id)
         {
-            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id.Equals(id));
+            return QueryableExtensions.Include(_context.Seller, obj => obj.Department).FirstOrDefault(obj => obj.Id.Equals(id));
         }
 
         public void Remove(int id)
@@ -36,6 +39,22 @@ namespace WebSales.Services
             var obj = _context.Seller.Find(id);
             _context.Seller.Remove(obj);
             _context.SaveChanges();
+        }
+
+        public void Update(Seller seller)
+        {
+            if (!_context.Seller.Any(x => x.Id == seller.Id))
+                throw new NotFoundException("Id not found!");
+
+            try
+            {
+                _context.Update(seller);
+                _context.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DBConcurrencyException(e.Message);
+            }
         }
     }
 }
