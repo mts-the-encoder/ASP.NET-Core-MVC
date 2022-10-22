@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using WebSales.Data;
 using WebSales.Models.Entities;
@@ -27,7 +28,7 @@ namespace WebSales.Services
 
         public Seller FindById(int id)
         {
-            return _context.Seller.FirstOrDefault(obj => obj.Id.Equals(id));
+            return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id.Equals(id));
         }
 
         public void Remove(int id)
