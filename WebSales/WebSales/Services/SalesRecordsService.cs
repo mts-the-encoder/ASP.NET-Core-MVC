@@ -4,6 +4,9 @@ using System.Data.Entity;
 using WebSales.Data;
 using WebSales.Models.Entities;
 using System.Linq;
+using System.Threading.Tasks;
+//using Microsoft.EntityFrameworkCore;
+using System.Data.Entity.Infrastructure;
 
 
 namespace WebSales.Services
@@ -38,5 +41,24 @@ namespace WebSales.Services
                 .ToList();
         }
 
+        public async Task<List<IGrouping<Department,SalesRecord>>> FindByDateGroupingAsync(DateTime? minDate,DateTime? maxDate)
+        {
+            var result = from obj in _context.SalesRecords select obj;
+            if (minDate.HasValue)
+            {
+                result = result.Where(x => x.Date >= minDate.Value);
+            }
+            if (maxDate.HasValue)
+            {
+                result = result.Where(x => x.Date <= maxDate.Value);
+            }
+            return await result
+                .Include(x => x.Seller)
+                .Include(x => x.Seller.Department)
+                .OrderByDescending(x => x.Date)
+                .GroupBy(x => x.Seller.Department)
+                .ToListAsync();
+        }
     }
 }
+
