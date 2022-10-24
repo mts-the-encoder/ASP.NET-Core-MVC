@@ -66,8 +66,17 @@ namespace WebSales.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            _sellerService.Remove(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _sellerService.Remove(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (IntegrityException e)
+            {
+                return RedirectToAction(nameof(Error),
+                    new
+                    { message = e.Message });
+            }
         }
 
         public IActionResult Details(int? id)
